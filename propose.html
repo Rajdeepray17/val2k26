@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Question for Sadia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-pink: #fff5f7;
+            --deep-gold: #b08d55;
+            --rose-dark: #881337;
+            --soft-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-pink);
+            color: var(--rose-dark);
+            overflow-x: hidden;
+            background-image: radial-gradient(#ffe4e6 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        h1, h2, .script-font {
+            font-family: 'Great Vibes', cursive;
+        }
+
+        .serif-font {
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        /* --- POLAROID ANIMATION --- */
+        .polaroid-container {
+            perspective: 1000px;
+        }
+        .polaroid {
+            background: white;
+            padding: 12px 12px 40px 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transform: rotate(-3deg);
+            width: 140px; /* Smaller for inside letter */
+            margin: 0 auto;
+        }
+        .polaroid img, .polaroid div.placeholder {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- FEATURE 1: CONFESSION ENVELOPE (New Start) --- */
+        .envelope-stage {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            margin-top: 20px;
+        }
+        .envelope {
+            position: relative;
+            width: 280px;
+            height: 180px;
+            background: #9f1239;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .envelope:hover {
+            transform: scale(1.02);
+        }
+        
+        /* The Flap */
+        .env-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 140px solid transparent;
+            border-right: 140px solid transparent;
+            border-top: 100px solid #be123c; /* Lighter red */
+            transform-origin: top;
+            transition: transform 0.6s ease-in-out, z-index 0.2s;
+            z-index: 5;
+        }
+        
+        /* The Pocket (Front triangles) */
+        .env-pocket-left {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 140px solid #881337; /* Darker */
+            border-top: 90px solid transparent;
+            border-bottom: 90px solid transparent;
+            z-index: 4;
+        }
+        .env-pocket-right {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-right: 140px solid #881337;
+            border-top: 90px solid transparent;
+            border-bottom: 90px solid transparent;
+            z-index: 4;
+        }
+        .env-pocket-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 140px solid transparent;
+            border-right: 140px solid transparent;
+            border-bottom: 100px solid #9f1239;
+            z-index: 4;
+        }
+        
+        /* The Letter inside */
+        .letter {
+            position: absolute;
+            bottom: 0;
+            left: 15px;
+            width: 250px;
+            height: 160px;
+            background: white;
+            padding: 20px;
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 1; /* Starts inside */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        /* Animation States */
+        .envelope.open .env-flap {
+            transform: rotateX(180deg);
+            z-index: 0;
+        }
+        
+        /* --- NEW: Full Visibility Logic --- */
+        .envelope.fully-opened {
+            background: transparent !important; /* Hide red background */
+            box-shadow: none !important;
+            pointer-events: none;
+        }
+        .envelope.fully-opened .env-flap,
+        .envelope.fully-opened .env-pocket-left,
+        .envelope.fully-opened .env-pocket-right,
+        .envelope.fully-opened .env-pocket-bottom {
+            opacity: 0; /* Fade out envelope parts */
+            transition: opacity 0.5s ease;
+        }
+        
+        /* When fully opened, letter takes center stage */
+        .envelope.fully-opened .letter {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            /* Reset absolute positioning relative to envelope */
+            bottom: auto; 
+            /* Center nicely */
+            transform: translate(-50%, -50%) scale(1.1) !important; 
+            width: 90%;
+            max-width: 350px;
+            height: auto;
+            min-height: auto;
+            z-index: 100; /* High z-index */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            pointer-events: auto;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* --- GAME: FIND THE RING --- */
+        .flower-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .flower-item {
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            user-select: none;
+        }
+        .flower-item:hover {
+            transform: scale(1.2);
+        }
+        .flower-item.faded {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        /* --- RING BOX --- */
+        .ring-box-container {
+            width: 150px;
+            height: 150px;
+            background: var(--rose-dark);
+            margin: 0 auto;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            transition: all 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ring-box-lid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: #9f1239;
+            border-radius: 20px 20px 0 0;
+            transition: transform 0.6s ease;
+            transform-origin: top;
+            z-index: 2;
+            border-bottom: 2px solid #630822;
+        }
+        .ring-box-container.opened .ring-box-lid {
+            transform: rotateX(180deg);
+        }
+        .diamond-ring {
+            font-size: 4rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease 0.4s;
+        }
+        .ring-box-container.opened .diamond-ring {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- PROPOSAL BUTTONS --- */
+        .btn-yes {
+            background: linear-gradient(135deg, #b08d55 0%, #d4af37 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(176, 141, 85, 0.4);
+        }
+        .btn-no {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+        
+        /* Celebration Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Utility */
+        .fade-in {
+            animation: fadeIn 1s ease-in forwards;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="flex flex-col items-center min-h-screen py-10 px-4">
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Header -->
+    <header class="text-center mb-6 fade-in">
+        <div class="text-gold-500 text-lg tracking-widest uppercase text-gray-400 mb-2">February 8th</div>
+        <h1 class="text-5xl md:text-7xl text-rose-900 mb-2 drop-shadow-sm">Sadia...</h1>
+        <p class="text-md text-rose-700 italic serif-font">I have something to ask you.</p>
+    </header>
+
+    <!-- STEP 1: THE LETTER (New Intro) -->
+    <section id="step-letter" class="w-full max-w-md flex flex-col items-center gap-6 fade-in mb-20">
+        
+        <div class="envelope-stage">
+            <div class="envelope" onclick="openEnvelope(this)">
+                <!-- The Letter Sliding Out -->
+                <div class="letter">
+                    <div class="polaroid mb-2">
+                        <img src="Picture/us1.jpeg" alt="Us, Forever">
+                        <div class="text-center text-xs font-handwriting text-gray-500 mt-2">Us, Forever?</div>
+                    </div>
+                    <p class="text-sm text-gray-700 serif-font italic leading-relaxed mb-4">
+                        "My Dearest Sadia ji,<br>
+                        I've saved the promises for another day. Today isn't about the future we <i>might</i> have, it's about the choice I want to make right now."
+                    </p>
+                    <button onclick="event.stopPropagation(); startPhase2()" class="mt-auto px-6 py-2 rounded-full bg-rose-900 text-white text-xs uppercase tracking-wide shadow hover:bg-rose-800 transition">
+                        What is it?
+                    </button>
+                </div>
+                
+                <!-- Envelope Parts -->
+                <div class="env-flap"></div>
+                <div class="env-pocket-left"></div>
+                <div class="env-pocket-right"></div>
+                <div class="env-pocket-bottom"></div>
+            </div>
+        </div>
+        
+        <p id="env-hint" class="text-rose-400 text-sm mt-4 animate-bounce">Tap the envelope to open</p>
+    </section>
+
+    <!-- STEP 2: FIND THE RING -->
+    <section id="step-ring" class="w-full max-w-md hidden flex-col items-center gap-6 fade-in">
+        <h2 class="text-3xl text-rose-900 text-center script-font">But first...</h2>
+        <p class="text-gray-600 text-sm text-center">To ask the question, I need the ring.<br>It's hidden in these flowers.</p>
+        
+        <div class="flower-grid" id="flower-grid">
+            <!-- JS will populate this -->
+        </div>
+        
+        <p id="ring-hint" class="text-rose-400 text-sm h-6"></p>
+    </section>
+
+    <!-- STEP 3: THE PROPOSAL (Main) -->
+    <section id="step-proposal" class="w-full max-w-xl hidden flex-col items-center gap-8 fade-in relative py-10">
+        
+        <!-- Virtual Ring Box -->
+        <div class="ring-box-container" id="ring-box" onclick="toggleRingBox()">
+            <div class="ring-box-lid"></div>
+            <div class="diamond-ring">💍</div>
+        </div>
+        <p class="text-sm text-gray-400 mt-2">(Tap the box to open)</p>
+
+        <!-- The Question -->
+        <div id="proposal-content" class="text-center opacity-0 transition-opacity duration-1000">
+            <h2 class="text-4xl md:text-6xl text-rose-900 mb-6 mt-4 script-font">Will you be mine?</h2>
+            <p class="text-xl text-gray-700 mb-8 serif-font max-w-md mx-auto">
+                Sadia, I don't need the whole world, I just need you. <br>
+                Will you walk this path with me forever?
+            </p>
+
+            <!-- Buttons -->
+            <div class="flex justify-center items-center gap-8 relative h-20 w-full">
+                <button onclick="acceptProposal()" class="btn-yes px-10 py-4 rounded-full text-xl font-bold transform hover:scale-110 transition z-20">
+                    YES, I Will! ❤️
+                </button>
+                
+                <button id="btn-no" class="btn-no px-8 py-3 rounded-full text-lg font-medium absolute transition-all duration-200 z-10">
+                    No
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- STEP 4: SUCCESS & COUNTDOWN -->
+    <section id="step-success" class="hidden flex-col items-center text-center gap-6 fade-in z-50">
+        <h1 class="text-5xl md:text-7xl text-rose-600 script-font mb-4">She Said Yes! 💖</h1>
+        <div class="text-2xl text-gray-700 serif-font">
+            You just made me the happiest person alive, Tanwie.
+        </div>
+        <!-- Cute GIF -->
+        <img src="https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif" alt="Happy Hug" class="rounded-lg shadow-xl w-64 md:w-80 mt-4">
+
+        <!-- Countdown to Day 3 -->
+        <div class="mt-12 p-6 glass-card border-t border-rose-200 w-full max-w-md">
+            <p class="text-gray-500 uppercase text-xs tracking-widest mb-2">Next Stop: Chocolate Day</p>
+            <div id="countdown" class="text-rose-900 font-mono text-xl mb-4">
+                Loading...
+            </div>
+            
+            <a id="day3-link" href="chocolate.html" onclick="return checkDate(event)">
+                <button id="day3-btn" class="bg-gray-300 text-gray-500 px-8 py-3 rounded-full font-bold cursor-not-allowed transition-all duration-300">
+                    Next: Day 3 🍫
+                </button>
+            </a>
+            <p class="text-xs text-gray-400 mt-2">Unlocks on Feb 9th</p>
+        </div>
+    </section>
+
+    <!-- Audio Placeholder -->
+    <div class="fixed bottom-4 left-4 bg-white/80 p-2 rounded-full shadow-md z-40">
+        <audio id="bg-music" loop autoplay>
+            <source src="Songs/propose.mp3" type="audio/mpeg">
+        </audio>
+        <button onclick="playMusic()" class="text-2xl w-10 h-10 flex items-center justify-center text-rose-600">🎵</button>
+    </div>
+
+    <!-- Hidden Easter Egg Modal -->
+    <div id="easter-egg-modal" class="fixed inset-0 bg-black/90 hidden z-[200] flex items-center justify-center text-center p-6">
+        <div class="text-white max-w-lg">
+            <h2 class="text-4xl script-font text-gold-400 mb-4">A Secret for You</h2>
+            <p class="serif-font text-lg leading-loose">
+                "Forever" isn't just a word to me. <br>
+                It's the coffee in the morning, the walks in the evening, <br>
+                and every heartbeat in between. <br>
+                I choose you, Sadia. Always.
+            </p>
+            <button onclick="closeEasterEgg()" class="mt-8 border border-white px-6 py-2 rounded hover:bg-white hover:text-black transition">Close</button>
+        </div>
+    </div>
+
+    <script>
+        /* --- STATE MANAGEMENT --- */
+        let noClickCount = 0;
+
+        /* --- PHASE TRANSITIONS --- */
+        
+        // FEATURE 1: ENVELOPE LOGIC
+        function openEnvelope(el) {
+            if (!el.classList.contains('open')) {
+                // 1. Open the flap
+                el.classList.add('open');
+                document.getElementById('env-hint').style.display = 'none';
+
+                // 2. Wait for animation, then hide envelope and center letter
+                setTimeout(() => {
+                    el.classList.add('fully-opened');
+                }, 800);
+            }
+        }
+
+        function startPhase2() {
+            // Transition from Letter to Ring Game
+            document.getElementById('step-letter').classList.add('hidden');
+            const stepRing = document.getElementById('step-ring');
+            stepRing.classList.remove('hidden');
+            stepRing.classList.add('flex');
+            initFlowerGame();
+        }
+
+        function startPhase3() {
+            // Transition from Ring Game to Proposal
+            document.getElementById('step-ring').classList.add('hidden');
+            const stepProposal = document.getElementById('step-proposal');
+            stepProposal.classList.remove('hidden');
+            stepProposal.classList.add('flex');
+            initNoButton();
+        }
+
+        /* --- FEATURE 2: FIND THE RING GAME --- */
+        function initFlowerGame() {
+            const grid = document.getElementById('flower-grid');
+            const items = ['🌸', '🌺', '🌹', '🌻', '🌼', '🌷', '🪷', '💐'];
+            // Create 12 items
+            let gameItems = [];
+            for(let i=0; i<11; i++) {
+                gameItems.push({ type: 'flower', icon: items[Math.floor(Math.random() * items.length)] });
+            }
+            gameItems.push({ type: 'ring', icon: '🌸' }); // Hidden ring looks like a flower initially
+            
+            // Shuffle
+            gameItems.sort(() => Math.random() - 0.5);
+
+            gameItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flower-item';
+                div.innerText = item.icon;
+                
+                div.onclick = function() {
+                    if (item.type === 'ring') {
+                        div.innerText = '💍'; // Reveal
+                        div.style.transform = 'scale(1.5)';
+                        document.getElementById('ring-hint').innerText = "You found it! ✨";
+                        document.getElementById('ring-hint').className = "text-green-600 font-bold text-xl mt-4";
+                        createConfetti(div.getBoundingClientRect().left, div.getBoundingClientRect().top);
+                        setTimeout(startPhase3, 1500);
+                    } else {
+                        div.classList.add('faded');
+                        const hints = ["Not this one...", "Keep looking...", "Nope, just a flower.", "Closer..."];
+                        document.getElementById('ring-hint').innerText = hints[Math.floor(Math.random() * hints.length)];
+                    }
+                }
+                grid.appendChild(div);
+            });
+        }
+
+        /* --- PHASE 3: PROPOSAL LOGIC --- */
+        function toggleRingBox() {
+            const box = document.getElementById('ring-box');
+            if (!box.classList.contains('opened')) {
+                box.classList.add('opened');
+                // Show content after animation
+                setTimeout(() => {
+                    document.getElementById('proposal-content').classList.remove('opacity-0');
+                }, 500);
+            }
+        }
+
+        function initNoButton() {
+            const btnNo = document.getElementById('btn-no');
+            
+            // Desktop Hover
+            btnNo.addEventListener('mouseover', moveButton);
+            
+            // Mobile Touch (prevent click)
+            btnNo.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                moveButton();
+            });
+
+            btnNo.addEventListener('click', moveButton); // Fallback
+        }
+
+        function moveButton() {
+            const btnNo = document.getElementById('btn-no');
+            noClickCount++;
+
+            if (noClickCount >= 5) {
+                btnNo.style.opacity = '0';
+                btnNo.style.pointerEvents = 'none';
+                return;
+            }
+
+            // Move randomly within container limits roughly
+            const x = (Math.random() * 200) - 100; // -100 to 100
+            const y = (Math.random() * 200) - 100;
+            
+            // Apply translation directly
+            btnNo.style.transform = `translate(${x}px, ${y}px)`;
+        }
+
+        function acceptProposal() {
+            document.getElementById('step-proposal').classList.add('hidden');
+            const success = document.getElementById('step-success');
+            success.classList.remove('hidden');
+            success.classList.add('flex');
+            
+            // Trigger Massive Golden Rain
+            startGoldenRain();
+            playMusic();
+        }
+
+        /* --- VISUAL EFFECTS: GOLDEN RAIN --- */
+        function startGoldenRain() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            const colors = ['#b08d55', '#d4af37', '#ffd700', '#fff', '#c9184a'];
+
+            for(let i=0; i<150; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    speed: Math.random() * 3 + 2,
+                    size: Math.random() * 8 + 2,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rotation: Math.random() * 360,
+                    spin: Math.random() * 5 - 2.5
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0,0, canvas.width, canvas.height);
+                
+                particles.forEach(p => {
+                    p.y += p.speed;
+                    p.rotation += p.spin;
+                    
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rotation * Math.PI / 180);
+                    ctx.fillStyle = p.color;
+                    
+                    // Draw square or heart
+                    if (Math.random() > 0.5) {
+                         ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                    } else {
+                        // Simple circle for glitter
+                        ctx.beginPath();
+                        ctx.arc(0, 0, p.size/2, 0, Math.PI*2);
+                        ctx.fill();
+                    }
+                    
+                    ctx.restore();
+
+                    if (p.y > canvas.height) p.y = -10;
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // Helper for simple click confetti in game
+        function createConfetti(x, y) {
+            // Minimal effect just for feedback
+        }
+
+        /* --- COUNTDOWN TO CHOCOLATE DAY (Day 3) --- */
+        function updateCountdown() {
+            const now = new Date();
+            const year = now.getFullYear();
+            // Target: Feb 9th
+            const targetDate = new Date(year, 1, 9, 0, 0, 0); 
+            
+            const diff = targetDate - now;
+
+            if (diff <= 0) {
+                document.getElementById('countdown').innerHTML = "<span class='text-green-600'>Chocolate Day is Here!</span>";
+                const btn = document.getElementById('day3-btn');
+                btn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                btn.classList.add('bg-amber-700', 'text-white', 'hover:bg-amber-800', 'transform', 'hover:scale-105');
+                return;
+            }
+
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('countdown').innerText = 
+                `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        function checkDate(e) {
+            const btn = document.getElementById('day3-btn');
+            if (btn.classList.contains('cursor-not-allowed')) {
+                e.preventDefault();
+                alert("Patience, my love! Chocolate Day is tomorrow. 🍫");
+                return false;
+            }
+            return true;
+        }
+
+        /* --- EXTRAS --- */
+        function playMusic() {
+            const music = document.getElementById('bg-music');
+            if (music.paused) {
+                music.play();
+            } else {
+                music.pause();
+            }
+        }
+
+        /* --- Auto-play Music on Load --- */
+        let musicStarted = false;
+        const bgMusic = document.getElementById('bg-music');
+        
+        // Try to play on page load
+        bgMusic.play().catch(() => console.log('Autoplay blocked, waiting for interaction'));
+        
+        // Play on any interaction if not already playing
+        const startBgMusic = () => {
+            if (!musicStarted && bgMusic.paused) {
+                bgMusic.play();
+                musicStarted = true;
+            }
+        };
+        
+        document.addEventListener('click', startBgMusic, true);
+        document.addEventListener('touchstart', startBgMusic, true);
+        document.addEventListener('scroll', startBgMusic, true);
+        document.addEventListener('mousemove', startBgMusic, { once: true });
+
+        function triggerEasterEgg() {
+            document.getElementById('easter-egg-modal').classList.remove('hidden');
+        }
+
+        function closeEasterEgg() {
+            document.getElementById('easter-egg-modal').classList.add('hidden');
+        }
+
+    </script>
+</body>
+</html>
