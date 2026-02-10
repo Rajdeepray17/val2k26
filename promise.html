@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Promises | Feb 11</title>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;600&family=Great+Vibes&family=Special+Elite&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --calm-blue: #f1f5f9;
+            --deep-blue: #334155;
+            --accent-pink: #fda4af;
+            --gold: #d4af37;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--deep-blue);
+            overflow-x: hidden;
+            min-height: 100vh;
+            touch-action: manipulation;
+        }
+
+        h1, h2, .script-font { font-family: 'Great Vibes', cursive; }
+        .serif-font { font-family: 'Cormorant Garamond', serif; }
+        .typewriter-font { font-family: 'Special Elite', monospace; }
+
+        /* --- UI ELEMENTS --- */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            border-radius: 20px;
+            transition: all 0.5s ease;
+        }
+
+        .btn-primary {
+            background: #334155;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(51, 65, 85, 0.2);
+        }
+        .btn-primary:hover { transform: translateY(-2px); background: #1e293b; }
+        .btn-primary:active { transform: translateY(0); }
+
+        /* --- PROGRESS BAR --- */
+        .progress-container {
+            width: 100%; height: 6px; background: #cbd5e1; border-radius: 10px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: #fda4af; width: 0%; transition: width 0.8s ease-in-out;
+        }
+
+        /* --- CHESTS --- */
+        .chest {
+            width: 50px; height: 40px;
+            background: url('https://img.icons8.com/color/96/treasure-chest.png') no-repeat center/contain;
+            cursor: pointer;
+            filter: grayscale(1);
+            opacity: 0.5;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+        .chest.unlocked {
+            filter: grayscale(0);
+            opacity: 1;
+            animation: bounce-soft 2s infinite;
+        }
+        .chest.opened {
+            filter: brightness(1.2);
+            transform: scale(0.9);
+            opacity: 0.7;
+            animation: none;
+        }
+        @keyframes bounce-soft {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* --- TASKS CONTAINER --- */
+        .task-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .task-section.active {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- GAME 1: STARS --- */
+        #star-canvas { background: #1e293b; border-radius: 12px; cursor: pointer; }
+
+        /* --- GAME 2: PUZZLE --- */
+        .puzzle-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px;
+            width: 200px; height: 200px; margin: 0 auto;
+            background: #e2e8f0; padding: 2px; border-radius: 8px;
+        }
+        .puzzle-piece {
+            width: 100%; height: 100%;
+            background-size: 200px 200px;
+            cursor: grab;
+            transition: transform 0.2s;
+        }
+        .puzzle-piece.correct { border: 2px solid #4ade80; pointer-events: none; }
+        .drop-zone { background: #cbd5e1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+
+        /* --- GAME 3: CATCH THE LOVE (Was Rain) --- */
+        #catch-canvas { 
+            background: linear-gradient(to bottom, #dbeafe, #eff6ff); 
+            border-radius: 12px; 
+            cursor: none; 
+            border: 2px solid #bfdbfe;
+        }
+
+        /* --- GAME 4: LIGHT THE PATH --- */
+        .maze-container {
+            position: relative; width: 300px; height: 200px; background: #0f172a; border-radius: 12px; overflow: hidden;
+        }
+        .maze-spark {
+            width: 20px; height: 20px; background: #facc15; border-radius: 50%;
+            position: absolute; box-shadow: 0 0 15px #facc15; transition: all 0.1s linear;
+            z-index: 10;
+        }
+        .maze-wall { position: absolute; background: #334155; }
+        .maze-goal {
+            position: absolute; width: 40px; height: 40px; background: #4ade80;
+            border-radius: 50%; opacity: 0.5; animation: pulse 1s infinite;
+        }
+
+        /* --- GAME 5: UNLOCK THE HEART --- */
+        .lock-container {
+            width: 200px; height: 200px; position: relative; margin: 0 auto;
+        }
+        .lock-spinner {
+            width: 100%; height: 100%; border-radius: 50%; border: 10px solid #cbd5e1;
+            position: relative; transform: rotate(0deg); transition: transform 0.1s linear;
+        }
+        .lock-target {
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 20px; background: #f43f5e; border-radius: 50%; z-index: 5;
+        }
+        .lock-pointer {
+            position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            width: 10px; height: 20px; background: #334155; border-radius: 5px;
+        }
+
+        /* --- TASK 7: THE PLEDGE --- */
+        .pledge-box {
+            background: #fff;
+            padding: 20px;
+            border-left: 6px solid #334155;
+            color: #334155;
+            font-size: 1.1rem;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+        }
+        .rajdeep-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #94a3b8;
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* --- MODAL (SCROLL REVEAL) --- */
+        #scroll-modal { background: rgba(30, 41, 59, 0.95); }
+        .scroll-paper {
+            background: #fffbf0; 
+            width: 0; 
+            height: 70vh; 
+            overflow-y: auto; /* Allow scrolling text */
+            overflow-x: hidden;
+            transition: width 1s ease-in-out;
+            border-left: 10px solid #d4af37; 
+            border-right: 10px solid #d4af37;
+            position: relative; 
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding-bottom: 2rem;
+        }
+        .scroll-paper.open { width: 95%; max-width: 600px; }
+        .promise-anim-box { width: 100%; height: 120px; display: flex; align-items: center; justify-content: center; margin-top: 1rem; }
+
+        /* Button Disabled */
+        .btn-disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; box-shadow: none; transform: none !important; }
+
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="w-full p-6 flex justify-between items-center z-10">
+        <div>
+            <h1 class="text-3xl text-slate-700 script-font">Promise Day</h1>
+            <p class="text-xs text-slate-400 uppercase tracking-widest">Feb 11 • For Sadia</p>
+        </div>
+        <div class="w-32">
+            <div class="flex justify-between text-xs text-slate-400 mb-1">
+                <span>Journey</span>
+                <span id="progress-text">0/7</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-fill" id="progress-bar"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow flex flex-col items-center justify-center p-4 relative w-full max-w-2xl mx-auto mb-24">
+        
+        <!-- INTRO -->
+        <div id="intro-screen" class="text-center active task-section flex-col items-center">
+            <div class="polaroid bg-white p-3 pb-12 shadow-xl rotate-2 w-64 mb-6">
+                <div class="w-full h-56 bg-slate-200 flex items-center justify-center overflow-hidden">
+                    <img src="Picture/Sadia1.jpeg" alt="Us" class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-700">
+                </div>
+                <div class="text-center mt-3 font-serif text-slate-600 italic">Quiet Moments</div>
+            </div>
+            <h2 class="text-2xl font-serif text-slate-700 mb-4">Commitment isn't just words.</h2>
+            <p class="text-slate-500 max-w-md mb-8 leading-relaxed">
+                It's about connecting the dots, building together, and keeping the light alive.
+                Complete these 6 games + 1 final pledge to unlock my promises to you.
+            </p>
+            <button onclick="nextTask(1); initStarGame();" class="btn-primary">Start Journey</button>
+        </div>
+
+        <!-- TASK 1: STARGAZER (Connect Dots) -->
+        <div id="task-1" class="task-section flex-col items-center w-full max-w-md text-center glass-panel p-8">
+            <h3 class="text-2xl font-serif mb-2">1. Written in the Stars</h3>
+            <p class="text-sm text-slate-500 mb-4">Connect the glowing stars to reveal our shape.</p>
+            <canvas id="star-canvas" width="300" height="300" class="mb-4 shadow-lg"></canvas>
+            <p id="star-msg" class="text-xs text-rose-500 font-bold h-4 opacity-0 transition-opacity">A Heart formed in the sky! ❤️</p>
+        </div>
+
+        <!-- TASK 2: PUZZLE OF US (Jigsaw) -->
+        <div id="task-2" class="task-section flex-col items-center w-full max-w-md text-center glass-panel p-8">
+            <h3 class="text-2xl font-serif mb-2">2. Building Us</h3>
+            <p class="text-sm text-slate-500 mb-4">Click the pieces to fix the picture.</p>
+            
+            <div class="puzzle-grid mb-4" id="puzzle-container">
+                <!-- Drop Zones -->
+                <div class="drop-zone" data-index="0"></div>
+                <div class="drop-zone" data-index="1"></div>
+                <div class="drop-zone" data-index="2"></div>
+                <div class="drop-zone" data-index="3"></div>
+            </div>
+            
+            <!-- Pieces to Drag -->
+            <div class="flex gap-2 justify-center" id="piece-pool">
+                <!-- JS will populate -->
+            </div>
+            <p class="text-xs text-slate-400 mt-4">Tap a piece, then tap a slot to place it.</p>
+        </div>
+
+        <!-- TASK 3: CATCH THE LOVE (New Game) -->
+        <div id="task-3" class="task-section flex-col items-center w-full max-w-md text-center glass-panel p-8">
+            <h3 class="text-2xl font-serif mb-2">3. Collecting Care</h3>
+            <p class="text-sm text-slate-500 mb-4">Move your heart to catch the falling care (💧).</p>
+            
+            <div class="relative mb-2">
+                <canvas id="catch-canvas" width="300" height="300"></canvas>
+                <button onclick="startCatchGame()" id="catch-start-btn" class="absolute inset-0 m-auto w-32 h-10 bg-white/80 rounded-full shadow font-bold text-slate-700">Start</button>
+            </div>
+            <p id="catch-score" class="text-sm font-bold text-blue-500">Care Collected: 0/10</p>
+        </div>
+
+        <!-- TASK 4: LIGHT THE PATH (Maze) -->
+        <div id="task-4" class="task-section flex-col items-center w-full max-w-md text-center glass-panel p-8">
+            <h3 class="text-2xl font-serif mb-2">4. Finding Light</h3>
+            <p class="text-sm text-slate-500 mb-4">Guide the spark through the darkness.</p>
+            
+            <div class="maze-container mb-4" id="maze-box">
+                <div class="maze-spark" id="spark" style="top: 10px; left: 10px;"></div>
+                <div class="maze-goal" style="bottom: 10px; right: 10px;"></div>
+                <!-- Walls -->
+                <div class="maze-wall" style="top: 50px; left: 0; width: 200px; height: 10px;"></div>
+                <div class="maze-wall" style="bottom: 50px; right: 0; width: 200px; height: 10px;"></div>
+                <div class="maze-wall" style="top: 50px; right: 50px; width: 10px; height: 100px;"></div>
+            </div>
+            
+            <div class="flex gap-2">
+                <button onmousedown="moveSpark(0, -10)" onmouseup="stopSpark()" class="p-2 bg-slate-200 rounded">⬆️</button>
+                <div class="flex flex-col gap-2">
+                    <button onmousedown="moveSpark(-10, 0)" onmouseup="stopSpark()" class="p-2 bg-slate-200 rounded">⬅️</button>
+                    <button onmousedown="moveSpark(10, 0)" onmouseup="stopSpark()" class="p-2 bg-slate-200 rounded">➡️</button>
+                </div>
+                <button onmousedown="moveSpark(0, 10)" onmouseup="stopSpark()" class="p-2 bg-slate-200 rounded">⬇️</button>
+            </div>
+            <p class="text-xs text-slate-400 mt-2">Use buttons to guide the light.</p>
+        </div>
+
+        <!-- TASK 5: UNLOCK THE HEART (Timing) -->
+        <div id="task-5" class="task-section flex-col items-center w-full max-w-md text-center glass-panel p-8">
+            <h3 class="text-2xl font-serif mb-2">5. Infinite Love</h3>
+            <p class="text-sm text-slate-500 mb-4">Tap 'Unlock' when the spinner hits the heart.</p>
+            
+            <div class="lock-container mb-4">
+                <div class="lock-spinner" id="spinner">
+                    <div class="lock-pointer"></div>
+                </div>
+                <div class="lock-target"></div>
+            </div>
+            
+            <button onclick="checkLock()" id="lock-btn" class="btn-primary w-full">Unlock!</button>
+            <p id="lock-msg" class="text-xs text-rose-500 font-bold mt-2 h-4"></p>
+        </div>
+
+        <!-- TASK 6: SIGNATURE (Kept as requested) -->
+        <div id="task-6" class="task-section flex-col items-center w-full max-w-md text-center glass-panel p-8">
+            <h3 class="text-2xl font-serif mb-2">6. Sealed Forever</h3>
+            <p class="text-sm text-slate-500 mb-4">Sign your name to seal these vows.</p>
+            
+            <canvas id="sign-canvas" width="300" height="150" class="bg-white border-b-2 border-slate-300 cursor-crosshair mb-4"></canvas>
+            
+            <div class="flex gap-4 w-full">
+                <button onclick="clearSignature()" class="text-xs text-slate-400 hover:text-slate-600">Clear</button>
+                <button onclick="finishTask6()" class="btn-primary flex-grow">Seal Promise</button>
+            </div>
+        </div>
+
+        <!-- TASK 7: THE SOLEMN PLEDGE (New) -->
+        <div id="task-7" class="task-section flex-col items-center w-full max-w-lg text-center glass-panel p-8">
+            <h3 class="text-2xl font-serif mb-2">7. The Solemn Pledge</h3>
+            <p class="text-sm text-slate-500 mb-6">Repeat after me, word for word.</p>
+            
+            <div class="pledge-box w-full text-left rounded-lg border border-slate-200 shadow-inner">
+                <span class="rajdeep-tag">Rajdeep says:</span>
+                <p id="rajdeep-line" class="typewriter-font text-lg leading-relaxed typing-cursor"></p>
+            </div>
+
+            <input type="text" id="pledge-input" placeholder="Type here..." class="w-full p-3 rounded-lg border border-slate-300 mb-4 focus:outline-none focus:border-rose-400 transition font-mono text-sm">
+            
+            <div class="flex justify-between w-full items-center">
+                <span id="pledge-progress" class="text-xs text-slate-400">Line 1/10</span>
+                <button onclick="checkPledge()" class="btn-primary px-6 py-2 text-sm">Confirm</button>
+            </div>
+            <p id="pledge-error" class="text-rose-500 text-xs mt-2 h-4 opacity-0 transition-opacity">Type exactly what I said.</p>
+        </div>
+
+        <!-- FINAL SCREEN -->
+        <div id="final-screen" class="task-section flex-col items-center w-full max-w-lg text-center mt-10">
+            <h2 class="text-4xl script-font text-rose-500 mb-6">Promises Kept.</h2>
+            <p class="serif-font text-slate-600 text-lg mb-8">
+                I may not be perfect, Sadia, but my effort for you will always be. <br>
+                Open your chests below to see what I've promised.
+            </p>
+            
+            <!-- Link to Day 6 (Hug Day) -->
+            <div class="mt-8 border-t border-slate-200 pt-6 w-full">
+                <p class="text-xs uppercase tracking-widest text-slate-400 mb-2">Next: Hug Day</p>
+                <div id="countdown" class="font-mono text-slate-600 mb-4">Loading...</div>
+                <a id="day6-link" href="hug.html" onclick="return checkDate(event)">
+                    <button id="day6-btn" class="btn-disabled px-8 py-3 rounded-full font-bold shadow-sm transition-all duration-300">
+                        Next: Day 6 🫂
+                    </button>
+                </a>
+                <p class="text-[10px] text-slate-300 mt-2">Unlocks on Feb 12th</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- TREASURE ROOM (Fixed Bottom) -->
+    <div class="fixed bottom-0 left-0 w-full bg-slate-100/90 backdrop-blur-md border-t border-white p-4 z-20">
+        <div class="max-w-xl mx-auto flex justify-between items-center px-2">
+            <!-- 6 Chests -->
+            <div class="chest" id="chest-1" onclick="openChest(1)"></div>
+            <div class="chest" id="chest-2" onclick="openChest(2)"></div>
+            <div class="chest" id="chest-3" onclick="openChest(3)"></div>
+            <div class="chest" id="chest-4" onclick="openChest(4)"></div>
+            <div class="chest" id="chest-5" onclick="openChest(5)"></div>
+            <div class="chest" id="chest-6" onclick="openChest(6)"></div>
+        </div>
+        <p class="text-center text-[10px] text-slate-400 mt-2 uppercase tracking-wider">Collect all 6 keys</p>
+    </div>
+
+    <!-- MODAL (Overlay) -->
+    <div id="scroll-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="scroll-paper" id="scroll-paper">
+            <div class="absolute top-4 right-4 text-2xl cursor-pointer text-slate-400" onclick="closeModal()">×</div>
+            
+            <!-- Dynamic Content -->
+            <div id="promise-anim" class="promise-anim-box"></div>
+            
+            <h2 id="promise-title" class="text-3xl script-font text-slate-800 mb-4 mt-4 px-6 text-center">Promise Title</h2>
+            <div class="px-8 pb-8 text-center">
+                <p id="promise-text" class="serif-font text-slate-700 text-lg italic leading-loose">
+                    "Here lies the promise text..."
+                </p>
+                <div class="w-16 h-1 bg-slate-200 mx-auto mt-6"></div>
+                <p class="text-xs text-slate-400 mt-2 uppercase tracking-widest">Rajdeep's Vow</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* --- STATE --- */
+        let currentStage = 0;
+        let chestStatus = [false, false, false, false, false, false]; 
+        const totalStages = 7;
+
+        /* --- NAVIGATION --- */
+        function nextTask(taskId) {
+            document.querySelectorAll('.task-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`task-${taskId}`).classList.add('active');
+        }
+
+        function unlockChest(index) {
+            // Only update chest status for the first 6 tasks which correspond to chests
+            if (index <= 6) {
+                chestStatus[index-1] = true;
+                const chest = document.getElementById(`chest-${index}`);
+                chest.classList.add('unlocked');
+                createParticles(chest);
+            }
+            
+            const pct = (index / totalStages) * 100;
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+            document.getElementById('progress-text').innerText = `${index}/7`;
+
+            setTimeout(() => {
+                if (index < 7) {
+                    nextTask(index + 1);
+                    // Init next games
+                    if(index === 1) initPuzzleGame();
+                    if(index === 2) initCatchGame(); // Changed to new game
+                    if(index === 3) initMazeGame();
+                    if(index === 4) initLockGame();
+                    if(index === 5) initSignCanvas();
+                    if(index === 6) initPledgeTask(); // Start Pledge logic
+                } else {
+                    document.querySelectorAll('.task-section').forEach(el => el.classList.remove('active'));
+                    document.getElementById('final-screen').classList.add('active');
+                    celebrateFinish();
+                }
+            }, 1500);
+        }
+
+        /* --- GAME 1: STARS (Canvas) --- */
+        function initStarGame() {
+            const c = document.getElementById('star-canvas');
+            const ctx = c.getContext('2d');
+            let stars = [];
+            const points = [ // Heart shape roughly
+                {x: 150, y: 80}, {x: 200, y: 50}, {x: 250, y: 100}, {x: 150, y: 220}, {x: 50, y: 100}, {x: 100, y: 50}
+            ];
+            let currentPoint = 0;
+
+            function draw() {
+                ctx.fillStyle = "#1e293b"; ctx.fillRect(0,0,300,300);
+                
+                // Draw all points
+                points.forEach((p, i) => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 4, 0, Math.PI*2);
+                    ctx.fillStyle = i <= currentPoint ? "#facc15" : "#475569";
+                    ctx.fill();
+                    // Glow for current target
+                    if(i === currentPoint) {
+                        ctx.beginPath(); ctx.arc(p.x, p.y, 10, 0, Math.PI*2);
+                        ctx.strokeStyle = "rgba(250, 204, 21, 0.5)"; ctx.stroke();
+                    }
+                });
+
+                // Draw lines
+                ctx.beginPath();
+                ctx.strokeStyle = "#facc15"; ctx.lineWidth = 2;
+                for(let i=0; i<currentPoint; i++) {
+                     ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.stroke();
+            }
+            
+            c.addEventListener('click', (e) => {
+                if(currentPoint >= points.length) return;
+                const rect = c.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const tx = points[currentPoint].x;
+                const ty = points[currentPoint].y;
+                
+                // Check distance
+                if(Math.hypot(x-tx, y-ty) < 20) {
+                    currentPoint++;
+                    draw();
+                    if(currentPoint === points.length) {
+                        // Close the shape
+                        ctx.lineTo(points[0].x, points[0].y); ctx.stroke();
+                        document.getElementById('star-msg').style.opacity = '1';
+                        setTimeout(() => unlockChest(1), 800);
+                    }
+                }
+            });
+            draw();
+        }
+
+        /* --- GAME 2: PUZZLE --- */
+        let selectedPiece = null;
+        function initPuzzleGame() {
+            const container = document.getElementById('piece-pool');
+            // Using a simple heart image split logic simulation
+            // 4 pieces indices: 0, 1, 2, 3
+            let pieces = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
+            
+            container.innerHTML = '';
+            pieces.forEach(p => {
+                const el = document.createElement('div');
+                el.className = 'w-16 h-16 bg-rose-200 border border-white cursor-pointer hover:scale-105 transition';
+                el.style.backgroundImage = "url('Picture/Sadia1.jpeg')"; // Assuming image exists
+                el.style.backgroundSize = "200% 200%";
+                // Calculate position based on index (0=TL, 1=TR, 2=BL, 3=BR)
+                const x = (p % 2) * 100;
+                const y = Math.floor(p / 2) * 100;
+                el.style.backgroundPosition = `${x}% ${y}%`;
+                el.dataset.id = p;
+                
+                el.onclick = () => selectPiece(el);
+                container.appendChild(el);
+            });
+
+            // Add click listeners to drop zones
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.onclick = () => placePiece(zone);
+            });
+        }
+
+        function selectPiece(el) {
+            if(selectedPiece) selectedPiece.classList.remove('ring', 'ring-rose-500');
+            selectedPiece = el;
+            el.classList.add('ring', 'ring-2', 'ring-rose-500');
+        }
+
+        function placePiece(zone) {
+            if(!selectedPiece || zone.hasChildNodes()) return;
+            
+            // Check if correct
+            const correctId = parseInt(zone.dataset.index);
+            const pieceId = parseInt(selectedPiece.dataset.id);
+            
+            if(correctId === pieceId) {
+                // Correct place
+                zone.appendChild(selectedPiece);
+                selectedPiece.classList.remove('ring', 'ring-rose-500', 'cursor-pointer');
+                selectedPiece.onclick = null;
+                selectedPiece = null;
+                checkPuzzleWin();
+            } else {
+                // Wrong
+                selectedPiece.classList.add('animate-pulse', 'bg-red-200');
+                setTimeout(() => selectedPiece.classList.remove('animate-pulse', 'bg-red-200'), 500);
+            }
+        }
+
+        function checkPuzzleWin() {
+            const placed = document.querySelectorAll('.drop-zone .w-16').length;
+            if(placed === 4) unlockChest(2);
+        }
+
+        /* --- GAME 3: CATCH THE LOVE (Canvas - IMPROVED) --- */
+        let catchGameActive = false;
+        function initCatchGame() {
+            // Wait for user to start
+        }
+
+        function startCatchGame() {
+            if(catchGameActive) return;
+            catchGameActive = true;
+            document.getElementById('catch-start-btn').style.display = 'none';
+            
+            const c = document.getElementById('catch-canvas');
+            const ctx = c.getContext('2d');
+            let collected = 0;
+            let playerX = 150;
+            let items = []; // {x, y, type: 'care'|'doubt'}
+            
+            // Controls
+            c.addEventListener('mousemove', e => {
+                const rect = c.getBoundingClientRect();
+                playerX = e.clientX - rect.left;
+            });
+            c.addEventListener('touchmove', e => {
+                const rect = c.getBoundingClientRect();
+                playerX = e.touches[0].clientX - rect.left;
+            });
+
+            function loop() {
+                if(!catchGameActive) return;
+                ctx.clearRect(0,0,300,300);
+                
+                // Spawn items
+                if(Math.random() < 0.03) items.push({x: Math.random()*280+10, y: 0, type: 'care'});
+                if(Math.random() < 0.01) items.push({x: Math.random()*280+10, y: 0, type: 'doubt'});
+                
+                // Draw Player (Heart)
+                ctx.font = "24px Arial";
+                ctx.fillText("❤️", playerX-12, 280);
+                
+                // Draw items
+                items.forEach((item, i) => {
+                    item.y += 2;
+                    ctx.fillText(item.type === 'care' ? "💧" : "🚫", item.x-10, item.y);
+                    
+                    // Collision
+                    if(item.y > 260 && item.y < 285 && Math.abs(item.x - playerX) < 20) {
+                        if(item.type === 'care') {
+                            collected++;
+                            items.splice(i, 1);
+                        } else {
+                            collected = Math.max(0, collected - 1); // Penalty
+                            items.splice(i, 1);
+                            // Flash red
+                            c.style.borderColor = "red";
+                            setTimeout(() => c.style.borderColor = "#bfdbfe", 200);
+                        }
+                        
+                        document.getElementById('catch-score').innerText = `Care Collected: ${collected}/10`;
+                        
+                        if(collected >= 10) {
+                            catchGameActive = false;
+                            unlockChest(3);
+                        }
+                    }
+                });
+                
+                requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        /* --- GAME 4: LIGHT THE PATH (Maze Logic) --- */
+        let sparkPos = {x: 10, y: 10};
+        let sparkInterval;
+        
+        function initMazeGame() {
+            sparkPos = {x: 10, y: 10};
+            updateSpark();
+        }
+
+        function moveSpark(dx, dy) {
+            clearInterval(sparkInterval);
+            sparkInterval = setInterval(() => {
+                let nx = sparkPos.x + dx;
+                let ny = sparkPos.y + dy;
+                
+                let hit = false;
+                if(nx < 0 || nx > 280 || ny < 0 || ny > 180) hit = true; // Bounds
+                if(ny > 30 && ny < 60 && nx < 200) hit = true; // Top Wall
+                if(ny > 140 && ny < 160 && nx > 100) hit = true; // Bot Wall
+                if(nx > 230 && nx < 260 && ny > 50 && ny < 150) hit = true; // Vert Wall
+
+                if(!hit) {
+                    sparkPos.x = nx;
+                    sparkPos.y = ny;
+                    updateSpark();
+                    // Goal check (Bottom Right)
+                    if(nx > 250 && ny > 150) {
+                        clearInterval(sparkInterval);
+                        unlockChest(4);
+                    }
+                }
+            }, 50);
+        }
+
+        function stopSpark() { clearInterval(sparkInterval); }
+        
+        function updateSpark() {
+            const el = document.getElementById('spark');
+            el.style.left = sparkPos.x + 'px';
+            el.style.top = sparkPos.y + 'px';
+        }
+
+        /* --- GAME 5: UNLOCK THE HEART --- */
+        let lockSpinning = false;
+        let lockAngle = 0;
+        let lockFrame;
+        
+        function initLockGame() {
+            cancelAnimationFrame(lockFrame);
+            lockSpinning = true;
+            document.getElementById('lock-btn').classList.remove('btn-disabled');
+            
+            function loop() {
+                if(!lockSpinning) return;
+                lockAngle = (lockAngle + 4) % 360;
+                document.getElementById('spinner').style.transform = `rotate(${lockAngle}deg)`;
+                lockFrame = requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        window.checkLock = function() {
+            if(!lockSpinning) return;
+            if(lockAngle < 20 || lockAngle > 340) {
+                lockSpinning = false;
+                document.getElementById('lock-msg').innerText = "Unlocked! ❤️";
+                document.getElementById('lock-msg').className = "text-green-500 font-bold mt-2 h-4";
+                unlockChest(5);
+            } else {
+                document.getElementById('lock-msg').innerText = "Missed! Try again.";
+                setTimeout(() => document.getElementById('lock-msg').innerText = "", 500);
+            }
+        }
+
+
+        /* --- GAME 6: SIGNATURE (Legacy) --- */
+        let hasSigned = false;
+        function initSignCanvas() {
+            const c = document.getElementById('sign-canvas');
+            const ctx = c.getContext('2d');
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#334155";
+            let painting = false;
+            function start(e) { painting = true; draw(e); }
+            function end() { painting = false; ctx.beginPath(); hasSigned = true; }
+            function draw(e) {
+                if(!painting) return;
+                const rect = c.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+                ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y);
+            }
+            c.addEventListener('mousedown', start); c.addEventListener('touchstart', start);
+            c.addEventListener('mouseup', end); c.addEventListener('touchend', end);
+            c.addEventListener('mousemove', draw); c.addEventListener('touchmove', draw);
+        }
+        function clearSignature() {
+            const c = document.getElementById('sign-canvas');
+            c.getContext('2d').clearRect(0, 0, c.width, c.height); hasSigned = false;
+        }
+        
+        function finishTask6() {
+            if(hasSigned) unlockChest(6);
+            else alert("Please sign the promise.");
+        }
+
+        /* --- GAME 7: THE PLEDGE (New) --- */
+        const pledges = [
+            "I promise to hold your hand when the road gets rocky.",
+            "I promise to listen to your silence as much as your words.",
+            "I promise that no argument will ever be bigger than our love.",
+            "I promise to be your calm in every storm.",
+            "I promise to never stop trying to make you smile.",
+            "I promise to respect your dreams like they are my own.",
+            "I promise to choose you, every single day.",
+            "I promise to grow old with you, hand in hand.",
+            "I promise that you will never have to face this world alone.",
+            "I love you."
+        ];
+        let currentPledgeIndex = 0;
+
+        function initPledgeTask() {
+            currentPledgeIndex = 0;
+            typeWriter(pledges[0]);
+            document.getElementById('pledge-progress').innerText = `Line 1/${pledges.length}`;
+        }
+
+        function typeWriter(text) {
+            const el = document.getElementById('rajdeep-line');
+            el.innerHTML = '';
+            let i = 0;
+            const speed = 50; 
+            function type() {
+                if (i < text.length) {
+                    el.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        function checkPledge() {
+            const input = document.getElementById('pledge-input');
+            const userText = input.value.trim();
+            const targetText = pledges[currentPledgeIndex];
+            const errorMsg = document.getElementById('pledge-error');
+
+            // Special case for last line
+            if (currentPledgeIndex === pledges.length - 1) {
+                if (userText.toLowerCase() === "i love you too") {
+                    unlockChest(7);
+                } else {
+                    errorMsg.innerText = "Say it back... 'I love you too'";
+                    errorMsg.style.opacity = '1';
+                }
+                return;
+            }
+
+            if (userText.toLowerCase() === targetText.toLowerCase()) {
+                currentPledgeIndex++;
+                input.value = '';
+                errorMsg.style.opacity = '0';
+                
+                if (currentPledgeIndex < pledges.length) {
+                    document.getElementById('pledge-progress').innerText = `Line ${currentPledgeIndex + 1}/${pledges.length}`;
+                    typeWriter(pledges[currentPledgeIndex]);
+                }
+            } else {
+                errorMsg.innerText = "Type exactly what I said.";
+                errorMsg.style.opacity = '1';
+            }
+        }
+
+
+        /* --- CHEST & MODAL --- */
+        function openChest(id) {
+            if(!chestStatus[id-1]) { alert("Locked! Complete the task."); return; }
+            document.getElementById(`chest-${id}`).classList.add('opened');
+            
+            const modal = document.getElementById('scroll-modal');
+            const paper = document.getElementById('scroll-paper');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            setTimeout(() => paper.classList.add('open'), 300);
+
+            // CUSTOM PROMISES
+            const titles = ["Promise 1", "Promise 2", "Promise 3", "Promise 4", "Promise 5", "Final Promise"];
+            const texts = [
+                "Sadia Ji Congratulations on clearing the first task and thank you for always appreciating my efforts. I promise with all my heart that i will never give you a chance to cry. Jb need hogi toh we will cry together but i will never be the reason to your tears my jaanu. I love you, wish you finish the next task. Seeya",
+                "My girl's first time was so nice, she had to do it Twice. So this time I promise that there won't be any lies from my end which will create any misunderstanding and discomfort for you. See ya in the next task.",
+                "Hatrick of task completion. Wow baby you are doing great, agla sachha promise ye hai ki — I will never stop fighting for us. Our future won't be easy, forget Our future our present would have many challenges. Maybe i will not be able to win everytime but atleast i promise that i will never give up and i will keep on fighting. seeya soon in the next chest.",
+                "Fantastic Four ehh. Glad to see you reached here. This does means that you unlock rhe fourth promise. Cutu i pdomise to paiteintly listen to you and your needs and fulfil them with pleasure whenever I can. Aapki har chahat meri khushi hogi aur har khushi meri jaan hogi Sadia ji",
+                "Fifth Promise for my babygurl. Sadia ji i promise you that you will forever cherish and enjoy your importance, priority and value in my life whenever you are with me. I also promise that I will always keep my lady smiling no matter what.",
+                "Hurray my Malkin ji you have completed all your tasks and you are now here reading the final promise. This one is more than just a promise. Its something which is the whole point. So my cutu i promise to the moon and back that i would never let any obstacle or challenge set us apart and i would keep loving you even in an afterlife which we can never imagine. My love fot you will keep increasing with every passing day and i will make sure that we make it happen and start a happy family in the near future. This was all the promises by your Dearest Rajdeep. Thank you for being my Valentine, you have made my 2026 very very special"
+            ];
+
+            document.getElementById('promise-title').innerText = titles[id-1];
+            document.getElementById('promise-text').innerText = texts[id-1];
+            renderAnimation(id);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('scroll-modal');
+            const paper = document.getElementById('scroll-paper');
+            paper.classList.remove('open');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+            document.getElementById('promise-anim').innerHTML = ''; 
+        }
+
+        /* --- ANIMATIONS (Inside Scroll) --- */
+        function renderAnimation(id) {
+            const container = document.getElementById('promise-anim');
+            container.innerHTML = ''; 
+            if(id === 1) container.innerHTML = `<div class="text-4xl text-sky-200"><span class="animate-pulse">✨ ❤️ ✨</span></div>`;
+            else if(id === 2) container.innerHTML = `<div class="text-4xl">🤞 No Lies 🤞</div>`;
+            else if(id === 3) container.innerHTML = `<div class="text-6xl animate-bounce">⚔️❤️</div>`;
+            else if(id === 4) container.innerHTML = `<div class="text-6xl text-yellow-300">👂✨</div>`;
+            else if(id === 5) container.innerHTML = `<div class="text-6xl">😁👑</div>`;
+            else if(id === 6) container.innerHTML = `<div class="text-6xl">♾️👨‍👩‍👧‍👦</div>`;
+        }
+
+        /* --- UTILS --- */
+        function createParticles(target) {
+            const rect = target.getBoundingClientRect();
+            for(let i=0; i<10; i++) {
+                const p = document.createElement('div');
+                p.style.cssText = `position:fixed;left:${rect.left+25}px;top:${rect.top+20}px;width:8px;height:8px;background:#d4af37;border-radius:50%;transition:all 1s;z-index:99;`;
+                document.body.appendChild(p);
+                setTimeout(() => { p.style.transform = `translate(${Math.random()*100-50}px, -${Math.random()*100+20}px)`; p.style.opacity = '0'; }, 10);
+                setTimeout(() => p.remove(), 1000);
+            }
+        }
+        function celebrateFinish() {
+            for(let i=0; i<50; i++) {
+                const c = document.createElement('div');
+                c.style.cssText = `position:fixed;top:0;left:${Math.random()*100}vw;width:10px;height:10px;background:#f43f5e;z-index:50;transition:top 3s;`;
+                document.body.appendChild(c);
+                setTimeout(() => c.style.top = '100vh', 10);
+            }
+        }
+
+        /* Countdown */
+        function updateCountdown() {
+            const now = new Date();
+            const target = new Date(now.getFullYear(), 1, 12, 0, 0, 0); 
+            const diff = target - now;
+            if (diff <= 0) {
+                const btn = document.getElementById('day6-btn');
+                btn.classList.remove('btn-disabled'); btn.classList.add('bg-rose-500', 'text-white', 'shadow-lg'); return;
+            }
+            document.getElementById('countdown').innerText = `${String(Math.floor(diff/3600000)).padStart(2,'0')}h ${String(Math.floor((diff%3600000)/60000)).padStart(2,'0')}m`;
+        }
+        setInterval(updateCountdown, 1000); updateCountdown();
+
+        function checkDate(e) {
+            if (document.getElementById('day6-btn').classList.contains('btn-disabled')) { e.preventDefault(); alert("Hug Day is Feb 12th! 🫂"); return false; } return true;
+        }
+    </script>
+</body>
+</html>
