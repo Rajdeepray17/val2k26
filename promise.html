@@ -293,9 +293,12 @@
         </div>
 
         <!-- TASK 4: LIGHT THE PATH (Maze) -->
-        <div id="task-4" class="task-section flex-col items-center w-full max-w-md text-center glass-panel p-8">
+        <div id="task-4" class="task-section flex-col items-center w-full max-w-md text-center glass-panel p-8 relative">
             <h3 class="text-2xl font-serif mb-2">4. Finding Light</h3>
             <p class="text-sm text-slate-500 mb-4">Guide the spark through the darkness.</p>
+            
+            <!-- Bypass Bell -->
+            <button onclick="unlockChest(4)" class="absolute top-4 right-4 text-2xl hover:scale-125 transition" title="Skip task">🔔</button>
             
             <div class="maze-container mb-4" id="maze-box">
                 <div class="maze-spark" id="spark" style="top: 10px; left: 10px;"></div>
@@ -307,12 +310,12 @@
             </div>
             
             <div class="flex gap-2">
-                <button onmousedown="moveSpark(0, -10)" onmouseup="stopSpark()" class="p-2 bg-slate-200 rounded">⬆️</button>
+                <button onmousedown="startMove(0, -10)" onmouseup="stopMove()" ontouchstart="startMove(0, -10)" ontouchend="stopMove()" class="p-2 bg-slate-200 rounded">⬆️</button>
                 <div class="flex flex-col gap-2">
-                    <button onmousedown="moveSpark(-10, 0)" onmouseup="stopSpark()" class="p-2 bg-slate-200 rounded">⬅️</button>
-                    <button onmousedown="moveSpark(10, 0)" onmouseup="stopSpark()" class="p-2 bg-slate-200 rounded">➡️</button>
+                    <button onmousedown="startMove(-10, 0)" onmouseup="stopMove()" ontouchstart="startMove(-10, 0)" ontouchend="stopMove()" class="p-2 bg-slate-200 rounded">⬅️</button>
+                    <button onmousedown="startMove(10, 0)" onmouseup="stopMove()" ontouchstart="startMove(10, 0)" ontouchend="stopMove()" class="p-2 bg-slate-200 rounded">➡️</button>
                 </div>
-                <button onmousedown="moveSpark(0, 10)" onmouseup="stopSpark()" class="p-2 bg-slate-200 rounded">⬇️</button>
+                <button onmousedown="startMove(0, 10)" onmouseup="stopMove()" ontouchstart="startMove(0, 10)" ontouchend="stopMove()" class="p-2 bg-slate-200 rounded">⬇️</button>
             </div>
             <p class="text-xs text-slate-400 mt-2">Use buttons to guide the light.</p>
         </div>
@@ -664,8 +667,8 @@
             updateSpark();
         }
 
-        function moveSpark(dx, dy) {
-            clearInterval(sparkInterval);
+        function startMove(dx, dy) {
+            stopMove(); // Clear any existing interval
             sparkInterval = setInterval(() => {
                 let nx = sparkPos.x + dx;
                 let ny = sparkPos.y + dy;
@@ -682,14 +685,14 @@
                     updateSpark();
                     // Goal check (Bottom Right)
                     if(nx > 250 && ny > 150) {
-                        clearInterval(sparkInterval);
+                        stopMove();
                         unlockChest(4);
                     }
                 }
             }, 50);
         }
 
-        function stopSpark() { clearInterval(sparkInterval); }
+        function stopMove() { clearInterval(sparkInterval); }
         
         function updateSpark() {
             const el = document.getElementById('spark');
