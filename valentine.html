@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Sadia | My Forever Valentine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Great+Vibes&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-red: #4a0404;
+            --rose-gold: #b76e79;
+            --soft-cream: #fff5f5;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #0f0505;
+            color: var(--soft-cream);
+            overflow-x: hidden;
+            min-height: 100vh;
+            scroll-behavior: smooth;
+        }
+
+        /* --- FONTS --- */
+        .cinzel { font-family: 'Cinzel', serif; }
+        .great-vibes { font-family: 'Great Vibes', cursive; }
+        .playfair { font-family: 'Playfair Display', serif; }
+
+        /* --- ANIMATIONS --- */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .float-anim { animation: float 4s ease-in-out infinite; }
+
+        @keyframes pulse-soft {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+        .pulse-anim { animation: pulse-soft 3s infinite; }
+
+        /* --- GLASSMORPHISM --- */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* --- PARTICLES --- */
+        #particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0;
+        }
+        .particle {
+            position: absolute; background: rgba(255, 182, 193, 0.3);
+            border-radius: 50%; animation: rise 10s infinite linear;
+        }
+        @keyframes rise {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+        /* --- SECTION CONTROLS --- */
+        .section {
+            display: none;
+            min-height: 90vh;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            position: relative;
+            z-index: 10;
+            margin-bottom: 2rem;
+        }
+        .section.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* --- TYPING CURSOR --- */
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* --- COMPONENTS --- */
+        .polaroid {
+            background: white; padding: 12px 12px 40px 12px;
+            color: #333; transform: rotate(-3deg);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            transition: transform 0.3s;
+        }
+        .polaroid:hover { transform: rotate(0deg) scale(1.05); }
+
+        .btn-premium {
+            background: linear-gradient(45deg, #881337, #be123c);
+            color: white; padding: 12px 30px; border-radius: 50px;
+            font-family: 'Cinzel', serif; letter-spacing: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.4s; cursor: pointer;
+            box-shadow: 0 0 15px rgba(190, 18, 60, 0.3);
+        }
+        .btn-premium:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px rgba(190, 18, 60, 0.6);
+        }
+
+        /* --- SPECIFIC INTERACTIONS --- */
+        /* Envelope */
+        .envelope-container { perspective: 1000px; cursor: pointer; }
+        .envelope {
+            width: 300px; height: 200px; background: #881337;
+            position: relative; transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .envelope.open { transform: rotateX(180deg); opacity: 0; pointer-events: none; }
+        
+        /* Annoying Button */
+        #runaway-btn { position: absolute; transition: all 0.2s ease; }
+
+        /* Heartbeat Sync */
+        .heartbeat-circle {
+            width: 100px; height: 100px; background: #be123c;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; cursor: pointer; transition: transform 0.1s;
+            box-shadow: 0 0 30px #be123c;
+        }
+        .heartbeat-circle.beat { transform: scale(1.3); }
+
+        /* Audio Visualizer */
+        .visualizer-container {
+            display: flex; align-items: center; justify-content: center; gap: 6px; height: 60px;
+        }
+        .v-bar {
+            width: 6px; background: #fda4af; border-radius: 3px;
+            animation: visualize 1s ease-in-out infinite;
+        }
+        @keyframes visualize { 0%, 100% { height: 10px; } 50% { height: 50px; } }
+
+        /* Magic Bell */
+        #magic-bell {
+            position: fixed; top: 10px; right: 10px; z-index: 100;
+            font-size: 1.2rem; opacity: 0.3; cursor: pointer;
+        }
+        #magic-bell:hover { opacity: 1; }
+
+        /* --- NEW FLOATING GALLERY STYLES --- */
+        .floating-gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 3rem;
+            perspective: 1000px;
+        }
+        .media-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        /* Hover Effects */
+        .media-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(190, 18, 60, 0.4);
+            z-index: 20;
+        }
+        /* Specific Layout Positioning for "Floating" feel */
+        .media-card:nth-child(1) { transform: rotate(-2deg); margin-top: 20px; } /* Video */
+        .media-card:nth-child(2) { transform: rotate(3deg); margin-top: -20px; } /* Img 1 */
+        .media-card:nth-child(3) { transform: rotate(2deg); margin-top: 20px; } /* Img 2 */
+        .media-card:nth-child(4) { transform: rotate(-3deg); margin-top: -20px; } /* Img 3 */
+        
+        .aspect-16-9 {
+            aspect-ratio: 16 / 9;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            display: block;
+        }
+
+    </style>
+</head>
+<body onclick="playMusic()">
+
+    <div id="particles"></div>
+
+    <div id="magic-bell" onclick="skipSection()">🔔</div>
+
+    <div class="fixed bottom-4 right-4 z-50 glass-panel p-2 rounded-full flex items-center gap-2 opacity-50 hover:opacity-100 transition">
+        <button onclick="toggleMusic()" class="w-10 h-10 rounded-full bg-rose-900 flex items-center justify-center">🎵</button>
+        <audio id="bg-music" loop autoplay>
+            <source src="Songs/valentine.mp3" type="audio/mp3">
+        </audio>
+    </div>
+
+    <section id="s1" class="section active text-center">
+        <div class="glass-panel p-8 md:p-12 rounded-2xl max-w-2xl w-full float-anim relative">
+            <div class="w-32 h-32 mx-auto mb-6 rounded-lg overflow-hidden border-4 border-rose-900 shadow-lg">
+                <img src="gifs/Gif8.gif" alt="Cute Cat" class="w-full h-full object-contain"> 
+            </div>
+            <h1 class="great-vibes text-6xl md:text-8xl text-rose-400 mb-4 drop-shadow-lg">Happy Valentine's Day</h1>
+            <h2 class="cinzel text-xl md:text-2xl text-white tracking-[0.2em] mb-8">MY DEAREST SADIA</h2>
+            <div class="polaroid mx-auto w-64 rotate-2 mb-8">
+                <div class="w-full h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
+                    <img src="Picture/us1.jpeg" class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-700">
+                </div>
+                <div class="text-center mt-2 font-serif text-black">This Bond ❤️</div>
+            </div>
+            <button onclick="nextSection(2)" class="btn-premium">Begin Experience</button>
+        </div>
+    </section>
+
+    <section id="s2" class="section">
+        <div class="envelope-container" onclick="openLetter()">
+            <div class="envelope flex items-center justify-center rounded-lg shadow-2xl">
+                <span class="great-vibes text-4xl text-white">Open Me</span>
+            </div>
+        </div>
+        <div id="letter-content" class="hidden max-w-2xl glass-panel p-8 md:p-12 rounded-xl text-left">
+            <div id="typewriter-text" class="playfair text-lg md:text-xl leading-relaxed text-rose-100 typing-cursor whitespace-pre-wrap"></div>
+            <button id="letter-next-btn" onclick="nextSection(2.5)" class="btn-premium mt-8 mx-auto block opacity-0 transition">Continue</button>
+        </div>
+    </section>
+
+    <section id="s2.5" class="section text-center">
+        <div class="glass-panel p-8 rounded-xl max-w-lg mx-auto">
+            <div class="w-full rounded-lg overflow-hidden border border-rose-500/30 mb-6">
+                <img src="gifs/Gif9.gif" alt="Gif 9" class="w-full object-cover">
+            </div>
+            <p class="playfair text-xl text-rose-200 italic mb-6">
+                "I dont think you get it when i say 'Lets talk when we meet'"
+            </p>
+            <button onclick="nextSection(3)" class="btn-premium">Oh, I get it...</button>
+        </div>
+    </section>
+
+    <section id="s3" class="section text-center">
+        <h2 class="cinzel text-2xl mb-2 text-rose-300">Activity 1: The Stubborn Button</h2>
+        <p class="mb-8 italic opacity-70">"Sometimes annoying becomes a love language..."</p>
+        <div class="flex justify-center gap-4 mb-8">
+            <img src="gifs/Gif2.gif" class="w-32 rounded-lg border border-rose-500/30">
+            <img src="gifs/Gif3.gif" class="w-32 rounded-lg border border-rose-500/30">
+        </div>
+        <div class="relative w-full h-64 border border-white/10 rounded-xl bg-black/20 flex items-center justify-center overflow-hidden">
+            <p class="absolute top-4 text-sm text-gray-400">Try to click 'Skip'...</p>
+            <button id="runaway-btn" onmouseover="moveButton()" onclick="moveButton()" class="btn-premium bg-gray-700 text-xs py-2 px-6">SKIP THIS</button>
+            <button onclick="catchButton()" class="btn-premium absolute bottom-4">Okay, I Love You! (Click Me)</button>
+        </div>
+    </section>
+
+    <section id="s4" class="section text-center">
+        <div class="glass-panel p-8 rounded-full w-80 h-80 flex flex-col items-center justify-center pulse-anim cursor-pointer" onclick="giveKisses()">
+            <img src="gifs/Gif5.gif" class="w-40 mb-4 rounded-lg">
+            <h3 class="playfair text-xl mb-2">Energy Break!</h3>
+            <p class="text-sm">Cutie, you might be tired.<br>Tap for loads of kisses!</p>
+            <div id="kiss-counter" class="mt-2 font-bold text-2xl text-rose-400">0</div>
+        </div>
+        <button id="kiss-next" onclick="nextSection(4.5)" class="btn-premium mt-12 hidden">Energized? Next!</button>
+    </section>
+
+    <section id="s4.5" class="section text-center">
+        <h2 class="cinzel text-2xl mb-6 text-rose-300">Activity 2: Which Tanwie are you?</h2>
+        <div class="glass-panel p-8 rounded-xl max-w-lg w-full">
+            <div id="mood-display" class="w-full h-48 bg-black/20 rounded-lg mb-6 flex items-center justify-center overflow-hidden">
+                <p class="text-gray-400 italic">Select a mood...</p>
+            </div>
+            <div class="flex flex-wrap justify-center gap-3">
+                <button onclick="showMood('hungry')" class="btn-premium text-xs px-4">Hungry 🍗</button>
+                <button onclick="showMood('sleepy')" class="btn-premium text-xs px-4">Sleepy 😴</button>
+                <button onclick="showMood('romantic')" class="btn-premium text-xs px-4">Romantic 🌹</button>
+                <button onclick="showMood('angry')" class="btn-premium text-xs px-4">Angry 😡</button>
+            </div>
+        </div>
+        <button id="mood-next" onclick="nextSection(5)" class="btn-premium mt-8 hidden">I love all of them!</button>
+    </section>
+
+    <section id="s5" class="section text-center">
+        <h2 class="cinzel text-3xl mb-6 text-rose-300">Activity 3: The Slay Queen</h2>
+        
+        <div class="glass-panel p-4 rounded-xl max-w-md w-full mx-auto mb-6">
+            <div id="fit-frame" class="w-full h-[400px] bg-black/50 rounded-lg mb-4 flex items-center justify-center overflow-hidden relative">
+                <div id="fit1" class="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-500">
+                    <video class="w-full h-full object-cover" style="aspect-ratio: 16/9;" controls autoplay muted loop>
+                        <source src="fits/Fit1.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div id="fit2" class="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-500 opacity-0 pointer-events-none">
+                    <video class="w-full h-full object-cover" style="aspect-ratio: 16/9;" controls muted loop>
+                        <source src="fits/Fit2.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div id="fit3" class="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-500 opacity-0 pointer-events-none">
+                    <video class="w-full h-full object-cover" style="aspect-ratio: 16/9;" controls muted loop>
+                        <source src="fits/Fit3.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div id="fit-final" class="absolute inset-0 flex flex-col items-center justify-center bg-black transition-opacity duration-500 opacity-0 pointer-events-none">
+                    <img src="gifs/Gif7.gif" class="w-full h-full object-contain" alt="Gif 7">
+                </div>
+            </div>
+
+            <button id="fit-btn" onclick="nextFitSlide()" class="btn-premium w-full text-sm">Next Look ✨</button>
+            <p id="fit-caption" class="mt-4 playfair text-rose-200 text-lg hidden">"me when you slay hard just with your effortless looks"</p>
+        </div>
+
+        <button id="fit-next-section" onclick="nextSection(5.5)" class="btn-premium mt-4 hidden">Continue</button>
+    </section>
+
+    <section id="s5.5" class="section text-center">
+        <h2 class="cinzel text-3xl mb-6 text-rose-300">Activity 4: Heartbeat Sync</h2>
+        <p class="mb-8 text-sm text-gray-400">Tap the heart when it beats to sync our pulse.</p>
+        <div class="glass-panel p-10 rounded-xl max-w-sm mx-auto mb-6 flex flex-col items-center">
+            <div id="heart-btn" class="heartbeat-circle" onclick="beatHeart()">❤️</div>
+            <p id="sync-status" class="mt-6 font-mono text-rose-400">Sync: 0%</p>
+        </div>
+        <button id="sync-next" onclick="nextSection(6)" class="btn-premium mt-12 hidden">Perfectly Synced</button>
+    </section>
+
+    <section id="s6" class="section text-center">
+        <h2 class="cinzel text-2xl mb-8 text-rose-500">Activity 5: My Notty Thoughts </h2>
+        
+        <div class="glass-panel p-8 rounded-2xl relative w-full max-w-md min-h-[400px] flex flex-col items-center justify-center">
+            
+            <div id="thought-1" class="thought-slide w-full">
+                <div id="censored-overlay" class="absolute inset-0 bg-black/90 flex flex-col items-center justify-center rounded-2xl z-20">
+                    <p class="mb-4 text-xl">⚠️ Warning: Hot Content ⚠️</p>
+                    <button onclick="revealThought1()" class="btn-premium text-sm">I'm 18+ (Reveal)</button>
+                </div>
+                <div class="opacity-20 transition duration-1000" id="thought-1-content">
+                    <img src="gifs/Gif6.gif" class="w-full rounded-lg mb-4 shadow-lg">
+                    <p class="playfair italic text-lg mb-4">"I am waiting for you to be on top of me just like them..."</p>
+                    <button onclick="showThought2()" class="btn-premium text-xs">Wait, there's more...</button>
+                </div>
+            </div>
+
+            <div id="thought-2" class="thought-slide w-full hidden opacity-0 transition duration-1000">
+                <img src="gifs/Gif11.gif" class="w-full rounded-lg mb-4 shadow-lg">
+                <p class="playfair italic text-lg mb-4">The look i want my Madam ji to throw out of nowhere to seduce her bhondu billa</p>
+                <button onclick="showThought3()" class="btn-premium text-xs">One last thought...</button>
+            </div>
+
+            <div id="thought-3" class="thought-slide w-full hidden opacity-0 transition duration-1000">
+                <img src="gifs/Gif10.gif" class="w-full rounded-lg mb-4 shadow-lg">
+                <p class="playfair italic text-lg mb-4">"this is me after saying 'I love her eyes and personality the most'"</p>
+                <button onclick="nextSection(7)" class="btn-premium text-xs mt-4">Okay, I'm done blushing</button>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="s7" class="section text-center">
+        <h2 class="cinzel text-2xl mb-2">Activity 6: Catch My Love</h2>
+        <p class="text-sm mb-4">Click the falling hearts before they disappear!</p>
+        <div id="game-area" class="w-full max-w-lg h-64 border border-rose-500/30 rounded-xl relative overflow-hidden bg-black/40 cursor-crosshair"></div>
+        <p class="mt-2 text-rose-300">Score: <span id="heart-score">0</span>/10</p>
+    </section>
+
+    <section id="s8" class="section text-center">
+        <h2 class="cinzel text-2xl mb-4">Activity 7: Match Our Vibe</h2>
+        <div class="grid grid-cols-4 gap-2 max-w-sm mx-auto" id="memory-grid"></div>
+        <button id="memory-next" onclick="nextSection(8.5)" class="btn-premium mt-8 hidden">Perfect Match!</button>
+    </section>
+
+    <section id="s8.5" class="section text-center">
+        <h2 class="cinzel text-2xl mb-6 text-rose-300">Activity 8: Our Future</h2>
+        
+        <div class="glass-panel p-6 rounded-xl max-w-sm mx-auto">
+            <p class="playfair italic text-gray-300 mb-4">"Just a glimpse of what's coming..."</p>
+            <div class="w-full rounded-lg flex items-center justify-center overflow-hidden border border-rose-500/30">
+                <video class="w-full h-auto rounded-lg" style="aspect-ratio: 9/16;" controls autoplay muted loop>
+                    <source src="fits/Fit4.mp4" type="video/mp4">
+                </video>
+            </div>
+        </div>
+
+        <button id="future-next" onclick="nextSection(9)" class="btn-premium mt-8">I claim this!</button>
+    </section>
+
+    <section id="s9" class="section text-center">
+        <div class="glass-panel p-10 rounded-full w-64 h-64 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition duration-500 relative" onclick="playVoiceNote()">
+            <div class="absolute inset-0 rounded-full border border-rose-500/30 animate-ping"></div>
+            <div class="visualizer-container mb-4">
+                <div class="v-bar" style="animation-delay: 0s"></div>
+                <div class="v-bar" style="animation-delay: 0.2s"></div>
+                <div class="v-bar" style="animation-delay: 0.4s"></div>
+                <div class="v-bar" style="animation-delay: 0.1s"></div>
+                <div class="v-bar" style="animation-delay: 0.3s"></div>
+            </div>
+            <span class="text-2xl text-rose-300">Tap to Listen</span>
+        </div>
+        <audio id="voice-audio">
+            <source src="Songs/Audio.mp3" type="audio/mp3">
+        </audio>
+        <p class="mt-8 playfair italic text-lg opacity-0 transition duration-1000" id="voice-text">"This is my voice… saying what words cannot."</p>
+        <button id="voice-next" onclick="nextSection(10)" class="btn-premium mt-8 opacity-0 pointer-events-none transition">Continue</button>
+    </section>
+
+    <section id="s10" class="section text-center">
+        <div class="flex justify-center gap-4 mb-8 opacity-0 transition duration-1000" id="final-gifs">
+            <img src="gifs/Gif1.gif" class="w-32 rounded-full border-2 border-rose-500">
+            <img src="gifs/Gif4.gif" class="w-32 rounded-full border-2 border-rose-500">
+        </div>
+        <h2 id="final-q-pre" class="playfair text-xl mb-4 opacity-0 transition duration-1000">One last thing... before this day ends.</h2>
+        <div id="final-q-box" class="glass-panel p-12 rounded-2xl transform scale-90 opacity-0 transition duration-1000">
+            <h1 class="great-vibes text-5xl md:text-6xl text-rose-500 mb-8">Sadia... will you be mine forever?</h1>
+            <div class="flex justify-center gap-8">
+                <button onclick="finalAnswer('yes')" class="btn-premium bg-green-900 border-green-700 hover:bg-green-800 text-lg px-8">Yes ❤️</button>
+                <button onclick="finalAnswer('forever')" class="btn-premium bg-rose-900 border-rose-700 hover:bg-rose-800 text-lg px-8">Forever ♾️</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="s11" class="section text-center justify-end pb-12">
+        
+        <div class="floating-gallery">
+            <div class="media-card">
+                <video class="aspect-16-9" autoplay muted loop>
+                    <source src="fits/Memory.mp4" type="video/mp4"> </video>
+            </div>
+            <div class="media-card">
+                <img src="Picture/Memory1.jpeg" class="aspect-16-9" alt="Memory 1"> </div>
+            <div class="media-card">
+                <img src="Picture/Memory2.jpeg" class="aspect-16-9" alt="Memory 2"> </div>
+            <div class="media-card">
+                <img src="Picture/Memory3.jpeg" class="aspect-16-9" alt="Memory 3"> </div>
+        </div>
+
+        <h1 class="cinzel text-4xl mb-4 text-rose-300">I Love You, My Madam Ji</h1>
+        <p class="playfair italic text-lg text-gray-300 mb-4">"You are my favorite feeling."</p>
+        <div class="w-full h-1 bg-gradient-to-r from-transparent via-rose-500 to-transparent mb-4"></div>
+        <p class="text-xs text-gray-500 uppercase tracking-widest">End of Valentine Week 2026</p>
+    </section>
+
+    <script>
+        /* --- GLOBAL STATE --- */
+        let currentSection = 1;
+        const totalSections = 11;
+        let musicStarted = false;
+
+        /* --- PLAY MUSIC ON INTERACTION --- */
+        function playMusic() {
+            if (!musicStarted) {
+                const audio = document.getElementById('bg-music');
+                audio.play().then(() => {
+                    musicStarted = true;
+                }).catch(e => console.log("Autoplay prevented:", e));
+            }
+        }
+
+        /* --- NAVIGATION --- */
+        function nextSection(n) {
+            const currentEl = document.querySelector('.section.active');
+            if(currentEl) {
+                currentEl.classList.remove('active');
+                setTimeout(() => {
+                    currentEl.style.display = 'none';
+                    showNext(n);
+                }, 1000);
+            } else {
+                showNext(n);
+            }
+        }
+
+        function showNext(n) {
+            const nextEl = document.getElementById('s' + n);
+            if(nextEl) {
+                nextEl.style.display = 'flex';
+                setTimeout(() => {
+                    nextEl.classList.add('active');
+                    nextEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    if(n === 2) startLetterTypewriter();
+                    if(n === 5.5) startHeartbeatGame();
+                    if(n === 7) startHeartGame();
+                    if(n === 8) initMemoryGame();
+                    if(n === 10) showFinalSequence();
+                }, 50);
+                currentSection = n;
+            }
+        }
+
+        function skipSection() {
+            let next = Math.floor(currentSection) + 1;
+            if (currentSection === 2) next = 2.5;
+            if (currentSection === 2.5) next = 3;
+            if (currentSection === 4) next = 4.5;
+            if (currentSection === 4.5) next = 5;
+            if (currentSection === 5) next = 5.5;
+            if (currentSection === 5.5) next = 6;
+            if (currentSection === 8) next = 8.5;
+            if (currentSection === 8.5) next = 9;
+            nextSection(next);
+        }
+
+        /* --- SECTION 2: LETTER --- */
+        const letterText = `Sadia,\n\nIf love had a quiet form, it would look like the way you entered my life.\nNo noise, no grand moment — just slowly, naturally, becoming the best part of my every day.\n\nSomewhere between ordinary conversations and simple smiles, you became my favorite thought.\nThe person my mind returns to without effort.\nThe presence that makes even silence feel complete.\n\nTanwie…\nWhat I feel for you was never about a single day, a single week, or a celebration.\nIt is in the comfort you bring, the warmth you carry, and the strange, beautiful calm my heart finds in you.\n\nYou made my world softer without trying.\nHappier without forcing.\nMore meaningful without even knowing.\n\nAnd if there is one truth I want this page to hold, it is this:\nI choose you.\nNot just today.\nBut in every quiet tomorrow that follows.\n\nHappy Valentine’s Day, Sadia.\nYou are my favorite feeling.`;
+
+        function openLetter() {
+            document.querySelector('.envelope').classList.add('open');
+            document.getElementById('letter-content').classList.remove('hidden');
+            setTimeout(startLetterTypewriter, 800);
+        }
+
+        function startLetterTypewriter() {
+            const el = document.getElementById('typewriter-text');
+            if(el.innerHTML.length > 0) return;
+            let i = 0;
+            function type() {
+                if (i < letterText.length) {
+                    el.innerHTML += letterText.charAt(i);
+                    i++;
+                    setTimeout(type, 30);
+                } else {
+                    document.getElementById('letter-next-btn').style.opacity = '1';
+                }
+            }
+            type();
+        }
+
+        /* --- SECTION 3: ANNOYING BUTTON --- */
+        function moveButton() {
+            const btn = document.getElementById('runaway-btn');
+            const x = Math.random() * 200 - 100;
+            const y = Math.random() * 100 - 50;
+            btn.style.transform = `translate(${x}px, ${y}px)`;
+        }
+        function catchButton() {
+            alert("I knew you loved me! ❤️");
+            nextSection(4);
+        }
+
+        /* --- SECTION 4: KISSES --- */
+        let kisses = 0;
+        function giveKisses() {
+            kisses++;
+            document.getElementById('kiss-counter').innerText = kisses;
+            createHeartParticle();
+            if(kisses >= 10) document.getElementById('kiss-next').classList.remove('hidden');
+        }
+
+        /* --- SECTION 4.5: MOOD SWING --- */
+        function showMood(mood) {
+            const display = document.getElementById('mood-display');
+            let content = '';
+            if(mood === 'hungry') content = '<span class="text-4xl">🍕</span><p>Feed me now!</p>';
+            if(mood === 'sleepy') content = '<span class="text-4xl">😴</span><p>Cuddle mode activated</p>';
+            if(mood === 'romantic') content = '<span class="text-4xl">🥰</span><p>Kiss me you fool</p>';
+            if(mood === 'angry') content = '<span class="text-4xl">😤</span><p>Bring chocolate or die</p>';
+            display.innerHTML = content;
+            document.getElementById('mood-next').classList.remove('hidden');
+        }
+
+        /* --- SECTION 5: FIT CHECK SLIDER (UPDATED) --- */
+        let fitStep = 1;
+        function nextFitSlide() {
+            if (fitStep === 1) {
+                document.getElementById('fit1').style.opacity = '0';
+                document.getElementById('fit1').style.pointerEvents = 'none';
+                document.getElementById('fit2').classList.remove('opacity-0', 'pointer-events-none');
+                fitStep++;
+            } else if (fitStep === 2) {
+                document.getElementById('fit2').style.opacity = '0';
+                document.getElementById('fit2').style.pointerEvents = 'none';
+                document.getElementById('fit3').classList.remove('opacity-0', 'pointer-events-none');
+                fitStep++;
+            } else if (fitStep === 3) {
+                document.getElementById('fit3').style.opacity = '0';
+                document.getElementById('fit3').style.pointerEvents = 'none';
+                document.getElementById('fit-final').classList.remove('opacity-0', 'pointer-events-none');
+                
+                document.getElementById('fit-btn').style.display = 'none'; // Hide next btn
+                document.getElementById('fit-caption').classList.remove('hidden');
+                document.getElementById('fit-next-section').classList.remove('hidden');
+            }
+        }
+
+        /* --- SECTION 5.5: HEARTBEAT SYNC --- */
+        let syncCount = 0;
+        let isBeating = false;
+        function startHeartbeatGame() {
+            const heart = document.getElementById('heart-btn');
+            setInterval(() => {
+                heart.classList.add('beat');
+                isBeating = true;
+                setTimeout(() => { heart.classList.remove('beat'); isBeating = false; }, 200);
+            }, 1000);
+        }
+        function beatHeart() {
+            if(isBeating) {
+                syncCount += 20;
+                document.getElementById('sync-status').innerText = `Sync: ${syncCount}%`;
+                createHeartParticle();
+                if(syncCount >= 100) document.getElementById('sync-next').classList.remove('hidden');
+            } else {
+                syncCount = Math.max(0, syncCount - 10);
+                document.getElementById('sync-status').innerText = `Sync: ${syncCount}% (Miss!)`;
+            }
+        }
+
+        /* --- SECTION 6: THREE GIFS --- */
+        function removeCensor() {
+            document.getElementById('censored-overlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('censored-overlay').style.display = 'none';
+                document.getElementById('naughty-content').classList.remove('opacity-20');
+            }, 1000);
+        }
+        function revealThought1() { removeCensor(); }
+        function showThought2() {
+            document.getElementById('thought-1').classList.add('hidden');
+            document.getElementById('thought-2').classList.remove('hidden');
+            setTimeout(() => document.getElementById('thought-2').classList.remove('opacity-0'), 100);
+        }
+        function showThought3() {
+            document.getElementById('thought-2').classList.add('hidden');
+            document.getElementById('thought-3').classList.remove('hidden');
+            setTimeout(() => document.getElementById('thought-3').classList.remove('opacity-0'), 100);
+        }
+
+        /* --- SECTION 7: HEART CATCHER --- */
+        let score = 0;
+        function startHeartGame() {
+            const area = document.getElementById('game-area');
+            const interval = setInterval(() => {
+                if(score >= 10) {
+                    clearInterval(interval);
+                    area.innerHTML = '<div class="h-full flex items-center justify-center text-rose-300 font-bold">You caught my heart! <button onclick="nextSection(8)" class="btn-premium ml-4 text-xs">Next</button></div>';
+                    return;
+                }
+                const h = document.createElement('div');
+                h.innerHTML = '❤️'; h.style.position = 'absolute'; h.style.left = Math.random()*90+'%'; h.style.top = '-20px'; h.style.fontSize = '24px'; h.style.cursor = 'pointer'; h.style.transition = 'top 3s linear';
+                h.onclick = () => { score++; document.getElementById('heart-score').innerText = score; h.remove(); };
+                area.appendChild(h);
+                setTimeout(() => h.style.top = '120%', 50); setTimeout(() => h.remove(), 3000);
+            }, 800);
+        }
+
+        /* --- SECTION 8: MEMORY MATCH --- */
+        const words = ['Love', 'Soul', 'Kiss', 'Hugs', 'Love', 'Soul', 'Kiss', 'Hugs'];
+        let opened = []; let matches = 0;
+        function initMemoryGame() {
+            const grid = document.getElementById('memory-grid'); grid.innerHTML = '';
+            words.sort(() => 0.5 - Math.random());
+            words.forEach(word => {
+                const card = document.createElement('div');
+                card.className = 'w-16 h-16 bg-rose-900 border border-rose-500 rounded flex items-center justify-center cursor-pointer text-transparent hover:bg-rose-800 transition';
+                card.innerText = word;
+                card.onclick = () => flipCard(card);
+                grid.appendChild(card);
+            });
+        }
+        function flipCard(card) {
+            if(opened.length < 2 && !card.classList.contains('bg-white')) {
+                card.classList.remove('text-transparent', 'bg-rose-900'); card.classList.add('bg-white', 'text-rose-900');
+                opened.push(card);
+                if(opened.length === 2) setTimeout(checkMatch, 800);
+            }
+        }
+        function checkMatch() {
+            if(opened[0].innerText === opened[1].innerText) {
+                matches++; if(matches === 4) document.getElementById('memory-next').classList.remove('hidden');
+            } else {
+                opened.forEach(c => { c.classList.add('text-transparent', 'bg-rose-900'); c.classList.remove('bg-white', 'text-rose-900'); });
+            }
+            opened = [];
+        }
+
+        /* --- SECTION 9: VOICE NOTE --- */
+        function playVoiceNote() {
+            document.getElementById('voice-text').style.opacity = '1';
+            const btn = document.getElementById('voice-next');
+            btn.classList.remove('opacity-0', 'pointer-events-none');
+            const voiceAudio = document.getElementById('voice-audio');
+            if (voiceAudio) {
+                voiceAudio.currentTime = 0;
+                voiceAudio.play().catch(() => {});
+            }
+        }
+
+        /* --- SECTION 10: FINAL REVEAL --- */
+        function showFinalSequence() {
+            setTimeout(() => document.getElementById('final-gifs').classList.remove('opacity-0'), 500);
+            setTimeout(() => document.getElementById('final-q-pre').classList.remove('opacity-0'), 2000);
+            setTimeout(() => document.getElementById('final-q-box').classList.remove('scale-90', 'opacity-0'), 4000);
+        }
+        function finalAnswer(type) {
+            if(type === 'yes') alert("I knew it! ❤️"); else alert("Forever it is! ♾️");
+            nextSection(11);
+        }
+
+        /* --- UTILS --- */
+        function createHeartParticle() {
+            const h = document.createElement('div'); h.innerText = '💋'; h.style.position = 'fixed'; h.style.left = Math.random()*100+'vw'; h.style.bottom = '0'; h.style.fontSize = '20px'; h.style.animation = 'rise 2s ease-out forwards';
+            document.body.appendChild(h); setTimeout(() => h.remove(), 2000);
+        }
+        function toggleMusic() {
+            const audio = document.getElementById('bg-music');
+            if(audio.paused) {
+                audio.play();
+                musicStarted = true;
+            } else {
+                audio.pause();
+            }
+        }
+        // Particle Init
+        for(let i=0; i<20; i++) {
+            const p = document.createElement('div'); p.className = 'particle';
+            p.style.left = Math.random()*100+'%'; p.style.width = Math.random()*10+5+'px'; p.style.height = p.style.width; p.style.animationDelay = Math.random()*5+'s';
+            document.getElementById('particles').appendChild(p);
+        }
+    </script>
+</body>
+</html>
